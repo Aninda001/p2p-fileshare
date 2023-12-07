@@ -1,26 +1,26 @@
 "use client";
-const uuid = 343244;
-const shareOptions = ["wb", "fb", "email", "tg"];
+import styles from "./filedrop.module.css";
 
-const FileDrop = () => {
-    const ClickHandler = () => {
-        navigator.clipboard.writeText(uuid);
+const FileUpload = () => {
+    const dropHandler = (e) => {
+        e.preventDefault();
+        console.log(e);
     };
 
     return (
-        <div>
-            <div>
-                <span>Your unique ID </span>
-                {uuid}
-                <button onClick={ClickHandler}>Copy</button>
-                <div>
-                    {shareOptions.map((media, ind) => (
-                        <span key={ind}>{media} </span>
-                    ))}
+        <>
+            <label
+                htmlFor="upload"
+                onDrop={dropHandler}
+                onDragOver={dropHandler}
+            >
+                <div className={styles.fileupload}>
+                    Drag & Drop file or click to upload
                 </div>
-            </div>
-        </div>
+            </label>
+            <input type="file" id="upload" className={styles.inp} />
+        </>
     );
 };
 
-export default FileDrop;
+export default FileUpload;
