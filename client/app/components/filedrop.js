@@ -12,7 +12,7 @@ const FileUpload = () => {
             <label
                 htmlFor="upload"
                 onDrop={dropHandler}
-                onDragOver={dropHandler}
+                onDragOver={(e) => e.preventDefault()}
             >
                 <div className={styles.fileupload}>
                     Drag & Drop file or click to upload

@@ -7,9 +7,10 @@ export default function Home() {
     return (
         <>
             <Navbar />
-            <main className={styles.main}></main>
-            <ShareID />
-            <FileUpload />
+            <main className={styles.main}>
+                <FileUpload />
+                <ShareID />
+            </main>
         </>
     );
 }
