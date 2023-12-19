@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&display=swap");
+
+.uuid {
+    padding: 0.5em 2em;
+    margin: 1em;
+    background-color: rgb(220, 220, 220);
+    font-weight: bold;
+    letter-spacing: 0.2em;
+    font-family: "Roboto Mono", monospace;
+}
+
+.share {
+    margin: 1em 0em;
+}
