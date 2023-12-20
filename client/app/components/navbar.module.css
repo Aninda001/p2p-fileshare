@@ -1,5 +1,11 @@
-.navbar{
+.navbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    background-color: #5f4c4c;
+    margin-bottom: 4vh;
+}
+
+.logo {
+    border-radius: 50%;
 }

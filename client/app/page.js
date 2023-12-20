@@ -1,4 +1,4 @@
-import Navbar from "@/app/components/navbar";
+import Navbar from "./components/navbar";
 import ShareID from "./components/shareID";
 import styles from "./page.module.css";
 import FileUpload from "./components/filedrop";
