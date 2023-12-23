@@ -5,10 +5,12 @@ const Connect = () => {
         console.log("clicked");
     };
     return (
-        <div className={styles.connect}>
+        <section className={styles.connect}>
             <input type="text" className={styles.input} />
-            <button onClick={clickHandler}>Connect</button>
-        </div>
+            <button onClick={clickHandler} className={styles.connectButton}>
+                Connect
+            </button>
+        </section>
     );
 };
 

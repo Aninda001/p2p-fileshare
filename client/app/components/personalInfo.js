@@ -2,21 +2,58 @@
 
 import styles from "./personalInfo.module.css";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import Image from "next/image";
+import { useState } from "react";
 
 const PersonalInfo = (props) => {
+    const [share, setShare] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const copyHandler = () => {
+        console.log("copied");
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 2000);
+    };
+
+    const forwarder = (name) => {
+        console.log(name);
+    };
+
     return (
         <section>
-            <span>Your unique ID</span>
+            <span className={styles.span}>Your unique ID :</span>
             <div className={styles.share}>
                 <code className={styles.uuid}>{props.uuid}</code>
                 <CopyToClipboard text={props.uuid}>
-                    <button>Copy</button>
+                    <button
+                        className={copied ? styles.copied : styles.copy}
+                        onClick={copyHandler}
+                    >
+                        {copied ? <text>Copied&#10003;</text> : "Copy"}
+                    </button>
                 </CopyToClipboard>
             </div>
-            <div>
-                {props.social.map((media, ind) => (
-                    <span key={ind}>{media} </span>
-                ))}
+            <div className={styles.social}>
+                <Image
+                    src="/youtube2-8079000_640.png"
+                    height={35}
+                    width={65}
+                    alt="youtube"
+                    onClick={() => setShare((prev) => !prev)}
+                />
+                {share &&
+                    props.social.map((media, ind) => (
+                        <Image
+                            key={ind}
+                            src={media.location}
+                            height={35}
+                            width={35}
+                            alt={media.name}
+                            onClick={() => forwarder(media.name)}
+                        />
+                    ))}
             </div>
         </section>
     );

@@ -1,14 +1,38 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&display=swap");
 
 .uuid {
-    padding: 0.5em 2em;
-    margin: 1em;
+    padding: 0.5rem 2rem;
     background-color: rgb(220, 220, 220);
     font-weight: bold;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.1rem;
     font-family: "Roboto Mono", monospace;
+    white-space: nowrap;
+    max-width: 25vw;
+    overflow: scroll;
 }
 
 .share {
-    margin: 1em 0em;
+    margin: 1rem 0rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.copy {
+    padding: 0.65rem 1.7rem;
+}
+
+.copied {
+    padding: 0.65rem 1rem;
+    background-color: rgb(151, 245, 153);
+}
+
+.span {
+    font-size: 1.2rem;
+}
+
+.social {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
 }
