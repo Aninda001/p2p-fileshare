@@ -28,7 +28,7 @@ const shareOptions = [
     },
 ];
 
-const ShareID = () => {
+const ShareID = (props) => {
     return (
         <div className={styles.shareID}>
             <PersonalInfo uuid={uuid} social={shareOptions} />

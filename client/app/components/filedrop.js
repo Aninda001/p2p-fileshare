@@ -4,6 +4,7 @@ import styles from "./filedrop.module.css";
 const FileUpload = () => {
     const dropHandler = (e) => {
         e.preventDefault();
+        console.log(e.dataTransfer.files);
     };
 
     return (

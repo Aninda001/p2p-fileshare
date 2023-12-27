@@ -10,7 +10,6 @@ const PersonalInfo = (props) => {
     const [copied, setCopied] = useState(false);
 
     const copyHandler = () => {
-        console.log("copied");
         setCopied(true);
         setTimeout(() => {
             setCopied(false);
@@ -31,7 +30,7 @@ const PersonalInfo = (props) => {
                         className={copied ? styles.copied : styles.copy}
                         onClick={copyHandler}
                     >
-                        {copied ? <text>Copied&#10003;</text> : "Copy"}
+                        {copied ? <span>Copied&#10003;</span> : "Copy"}
                     </button>
                 </CopyToClipboard>
             </div>
