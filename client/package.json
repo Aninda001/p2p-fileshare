@@ -10,12 +10,13 @@
   },
   "dependencies": {
     "eslint-config-next": "latest",
-    "next": "latest",
+    "next": "^14.0.4",
     "react": "latest",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "latest",
     "react-share": "^5.0.3",
     "socket.io-client": "^4.7.2",
+    "unique-names-generator": "^4.7.1",
     "uuid": "^9.0.1"
   }
 }

@@ -4,7 +4,11 @@ import styles from "./filedrop.module.css";
 const FileUpload = () => {
     const dropHandler = (e) => {
         e.preventDefault();
-        console.log(e.dataTransfer.files);
+        // let fs = e.dataTransfer.items[0]
+        //     .webkitGetAsEntry()
+        //     .createReader()
+        //     .readEntries((e) => console.log(e));
+        console.log(e.dataTransfer.items[0].getAsFile());
     };
 
     return (
@@ -18,7 +22,13 @@ const FileUpload = () => {
                     Drag & Drop file or click to upload
                 </div>
             </label>
-            <input type="file" id="upload" className={styles.inp} />
+            <input
+                type="file"
+                onChange={(e) => console.log(e.target.files)}
+                id="upload"
+                className={styles.inp}
+                multiple
+            />
         </>
     );
 };

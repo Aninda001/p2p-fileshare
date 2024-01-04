@@ -24,6 +24,7 @@ const Navbar = () => {
                     alt="github logo"
                     width={45}
                     height={45}
+                    className={styles.git}
                 />
             </Link>
         </nav>

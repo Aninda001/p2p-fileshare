@@ -27,12 +27,18 @@
 }
 
 .span {
+    display: block;
+    margin: 0.5rem 0rem;
     font-size: 1.2rem;
 }
 
 .social {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     width: 100%;
+}
+
+.personal {
+    margin-top: 9%;
 }

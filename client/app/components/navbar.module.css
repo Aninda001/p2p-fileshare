@@ -9,5 +9,11 @@
 }
 
 .logo {
+    margin-left: 10px;
+    border-radius: 50%;
+}
+
+.git {
+    margin-right: 10px;
     border-radius: 50%;
 }

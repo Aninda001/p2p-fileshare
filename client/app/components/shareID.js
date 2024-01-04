@@ -2,9 +2,7 @@
 
 import PersonalInfo from "./personalInfo";
 import styles from "./shareID.module.css";
-import Connect from "./connect";
 
-const uuid = "2c5ea4c0-4067-11e9-8bad-9b1deb4d3b7d";
 const shareOptions = [
     {
         name: "whatsapp",
@@ -31,8 +29,12 @@ const shareOptions = [
 const ShareID = (props) => {
     return (
         <div className={styles.shareID}>
-            <PersonalInfo uuid={uuid} social={shareOptions} />
-            <Connect />
+            <PersonalInfo
+                social={shareOptions}
+                dc={props.dc}
+                name={props.name}
+                connected={props.connected}
+            />
         </div>
     );
 };
