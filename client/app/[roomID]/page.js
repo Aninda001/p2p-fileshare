@@ -63,14 +63,8 @@ export default function Home() {
         socket.emit("addRoom", path, name);
         socket.emit("fetchlength", path);
 
-        // socket.on("joined", (data) => {
-        //     console.log(data);
-        //     setConnected((prev) => [...prev, data]);
-        // });
-        //
         pc.onicecandidate = (event) => {
             if (event.candidate) {
-                console.log("New ICE candidate: ", event.candidate);
                 socket.emit("ice", { ice: event.candidate, room: path });
             } else {
                 console.log("No more ICE candidate");
@@ -87,15 +81,32 @@ export default function Home() {
                 console.log(offer);
                 // Set up event listener for open data channel
                 channel.onopen = () => {
+                    channel.send(
+                        JSON.stringify({
+                            type: "username",
+                            id: socket.id,
+                            name: name,
+                        }),
+                    );
                     console.log("Data channel is open on the sender side.");
                 };
 
                 // Set up event listener for receiving messages
                 channel.onmessage = (event) => {
-                    console.log(
-                        "Received message on the sender side:",
-                        event.data,
-                    );
+                    let recieve = JSON.parse(event.data);
+                    if (recieve.type === "username") {
+                        setConnected((prev) => [
+                            ...prev,
+                            { id: recieve.id, name: recieve.name },
+                        ]);
+                    }
+
+                    if (recieve.type === "message") {
+                        console.log(
+                            "Received message on the sender side:",
+                            recieve,
+                        );
+                    }
                 };
                 socket.emit("offer", { offer: offer, room: path });
                 await pc.setLocalDescription(offer);
@@ -105,15 +116,31 @@ export default function Home() {
         pc.ondatachannel = (event) => {
             channel = event.channel;
             setDataChannel(channel);
-            console.log("Data channel is created!");
             // Set up event listener for open data channel
             channel.onopen = () => {
+                channel.send(
+                    JSON.stringify({
+                        type: "username",
+                        id: socket.id,
+                        name: name,
+                    }),
+                );
                 console.log("Data channel is open.");
             };
 
             // Set up event listener for receiving messages
             channel.onmessage = (event) => {
-                console.log("Received message : ", event.data);
+                let recieve = JSON.parse(event.data);
+                if (recieve.type === "username") {
+                    setConnected((prev) => [
+                        ...prev,
+                        { id: recieve.id, name: recieve.name },
+                    ]);
+                }
+
+                if (recieve.type === "message") {
+                    console.log("Received message : ", recieve);
+                }
             };
         };
         socket.on("offer", async (offer) => {
@@ -147,7 +174,6 @@ export default function Home() {
             socket.off("offer");
             socket.off("answer");
             socket.off("ice");
-            socket.off("joined");
             socket.disconnect();
         };
     }, []);

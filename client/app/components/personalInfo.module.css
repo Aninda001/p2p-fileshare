@@ -42,3 +42,11 @@
 .personal {
     margin-top: 9%;
 }
+
+.ConnectedUsers {
+    display: block;
+}
+
+.userlist {
+    max-height: 10vh;
+}

@@ -4,13 +4,22 @@ import styles from "./personalInfo.module.css";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { socket } from "../socket";
 
 const PersonalInfo = (props) => {
     const [roomurl, setRoomurl] = useState("");
     const [share, setShare] = useState(false);
     const [copied, setCopied] = useState(false);
 
+    const connectedUsersList = () => {
+        if (props.connected === undefined || props.connected.length === 0)
+            return <span>No one connected</span>;
+        else
+            return props.connected.map((user, ind) => (
+                <span key={ind} className={styles.ConnectedUsers}>
+                    {user.name}
+                </span>
+            ));
+    };
     const copyHandler = () => {
         setCopied(true);
         setTimeout(() => {
@@ -65,11 +74,7 @@ const PersonalInfo = (props) => {
             </section>
             <section className={styles.connected}>
                 <span className={styles.span}>Connected users :</span>
-                {/* <div className={styles.connectedUsers}> */}
-                {/*     {props.connected.map((user, ind) => ( */}
-                {/*         <span key={ind}>{user}</span> */}
-                {/*     ))} */}
-                {/* </div> */}
+                <div className={styles.userlist}>{connectedUsersList()}</div>
             </section>
         </>
     );
