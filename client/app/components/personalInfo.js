@@ -20,6 +20,7 @@ const PersonalInfo = (props) => {
                 </span>
             ));
     };
+
     const copyHandler = () => {
         setCopied(true);
         setTimeout(() => {
@@ -29,6 +30,7 @@ const PersonalInfo = (props) => {
 
     const forwarder = (name) => {
         console.log(name);
+        window.open(name.share + roomurl, "_blank");
     };
 
     useEffect(() => {
@@ -67,7 +69,7 @@ const PersonalInfo = (props) => {
                                 height={35}
                                 width={35}
                                 alt={media.name}
-                                onClick={() => forwarder(media.name)}
+                                onClick={() => forwarder(media)}
                             />
                         ))}
                 </div>

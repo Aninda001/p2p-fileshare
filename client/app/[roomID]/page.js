@@ -167,6 +167,11 @@ export default function Home() {
                 });
         });
 
+        socket.on("disconnected_user", (id) => {
+            console.log("disconnected user", id);
+            setConnected((prev) => prev.filter((user) => user.id !== id));
+        });
+
         return () => {
             socket.off("connect");
             socket.off("message");
@@ -174,6 +179,7 @@ export default function Home() {
             socket.off("offer");
             socket.off("answer");
             socket.off("ice");
+            socket.off("disconnected_user");
             socket.disconnect();
         };
     }, []);
