@@ -29,7 +29,6 @@ const PersonalInfo = (props) => {
     };
 
     const forwarder = (name) => {
-        console.log(name);
         window.open(name.share + roomurl, "_blank");
     };
 
