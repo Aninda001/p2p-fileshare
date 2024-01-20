@@ -1,51 +1,38 @@
 "use client";
 import styles from "./filedrop.module.css";
-import { useState } from "react";
 
-const FileUpload = () => {
-    const [selected, setSelected] = useState({
-        filelist: [],
-        totalsize: 0,
-        uploades: [],
-    });
+const FileUpload = ({ scanning, setScanning, selected, setSelected }) => {
+    const dropHandler = async (e) => {
+        let select = {
+            filelist: [],
+            totalsize: 0,
+            uploades: [],
+        };
 
-    const fileHandler = (e) => {
-        setSelected((prev) => ({
-            ...prev,
-            filelist: [...prev.filelist, e],
-            totalsize: prev.totalsize + e.size,
-        }));
-    };
-    const dropHandler = (e) => {
-        function scanFiles(item) {
-            // console.log(item);
-            const reader = new FileReader();
-
-            reader.onload = function (event) {
-                // Send the chunk over the DataChannel
-                console.log(event.target);
-                // console.log({
-                //     fileName: item.webkitRelativePath,
-                //     data: reader.result,
-                // });
-            };
-            if (item.isFile) {
-                item.file(fileHandler);
+        async function scanFiles(item) {
+            if ((item.fullPath.match(/\//g) || []).length === 1) {
+                select.uploades.push(item);
             }
 
-            if ((item.fullPath.match(/\//g) || []).length === 1) {
-                setSelected((prev) => ({
-                    ...prev,
-                    uploades: [...prev.uploades, item],
-                }));
+            if (item.isFile) {
+                await new Promise((resolve) => {
+                    item.file((e) => {
+                        select.filelist.push(e);
+                        select.totalsize += e.size;
+                        resolve();
+                    });
+                });
             }
 
             if (item.isDirectory) {
                 let directoryReader = item.createReader();
 
-                directoryReader.readEntries(function (entries) {
-                    entries.forEach(function (entry) {
-                        scanFiles(entry);
+                await new Promise((resolve) => {
+                    directoryReader.readEntries(async function(entries) {
+                        for (let entry of entries) {
+                            await scanFiles(entry);
+                        }
+                        resolve();
                     });
                 });
             }
@@ -55,13 +42,34 @@ const FileUpload = () => {
 
         e.preventDefault();
 
+        setScanning("started");
         for (let i = 0; i < items.length; i++) {
             let item = items[i].webkitGetAsEntry();
 
             if (item) {
-                scanFiles(item);
+                await scanFiles(item);
             }
         }
+        setSelected(select);
+        setScanning("done");
+    };
+
+    const fileInputHandler = async (files) => {
+        let select = {
+            filelist: [],
+            totalsize: 0,
+            uploades: [],
+        };
+
+        setScanning("started");
+        for (let i = 0; i < files.length; i++) {
+            select.filelist.push(files[i]);
+            select.totalsize += files[i].size;
+            select.uploades.push(files[i]);
+        }
+
+        setSelected(select);
+        setScanning("done");
     };
 
     const totalSize = () => {
@@ -78,19 +86,29 @@ const FileUpload = () => {
     };
 
     const uploadData = () => {
-        let folder = 0,
-            file = 0;
-        for (let i of selected.uploades) {
-            if (i.isFile) file++;
-            else folder++;
+        if (scanning === "started") return "Scanning files...";
+        else if (scanning === "done") {
+            let folder = 0,
+                file = 0;
+            for (let i of selected.uploades) {
+                if (i.isFile) file++;
+                else folder++;
+            }
+            return (
+                <span>
+                    {file} files and {folder} folders
+                    <br />
+                    Total size : {totalSize()}
+                </span>
+            );
+        } else {
+            return (
+                <span>
+                    Drag & Drop file & folder
+                    <br /> or click to upload
+                </span>
+            );
         }
-        return (
-            <span>
-                {file} files and {folder} folders
-                <br />
-                Total size : {totalSize()}
-            </span>
-        );
     };
 
     return (
@@ -100,20 +118,11 @@ const FileUpload = () => {
                 onDrop={dropHandler}
                 onDragOver={(e) => e.preventDefault()}
             >
-                <div className={styles.fileupload}>
-                    {selected.uploades.length ? (
-                        uploadData()
-                    ) : (
-                        <span>
-                            Drag & Drop file & folder
-                            <br /> or click to upload
-                        </span>
-                    )}
-                </div>
+                <div className={styles.fileupload}>{uploadData()}</div>
             </label>
             <input
                 type="file"
-                onChange={(e) => console.log("changed")}
+                onChange={(e) => fileInputHandler(e.target.files)}
                 id="upload"
                 className={styles.inp}
                 multiple

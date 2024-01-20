@@ -7,15 +7,13 @@ const shareOptions = [
     {
         name: "whatsapp",
         location: "/whatsapp-873316_640.png",
-        share: `${
-            "https://" +
-            `${
-                /(android|iphone|ipad|mobile)/i.test(navigator.userAgent)
-                    ? "api"
-                    : "web"
+        share: `${"https://" +
+            `${/(android|iphone|ipad|mobile)/i.test(navigator.userAgent)
+                ? "api"
+                : "web"
             }` +
             ".whatsapp.com/send?text="
-        }`,
+            }`,
     },
     {
         name: "facebook",
@@ -42,12 +40,7 @@ const shareOptions = [
 const ShareID = (props) => {
     return (
         <div className={styles.shareID}>
-            <PersonalInfo
-                social={shareOptions}
-                dc={props.dc}
-                name={props.name}
-                connected={props.connected}
-            />
+            <PersonalInfo social={shareOptions} {...props} />
         </div>
     );
 };

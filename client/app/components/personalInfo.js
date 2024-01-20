@@ -28,6 +28,41 @@ const PersonalInfo = (props) => {
         }, 2000);
     };
 
+    const sendHandler = async () => {
+        // const reader = new FileReader();
+        //
+        // reader.onload = function(e) {
+        //     // Send the chunk over the DataChannel
+        //     console.log(e);
+        // };
+
+        const chunkSize = 1024 * 16;
+        for (let file of props.selected.filelist) {
+            // let filename;
+            // if (file.webkitRelativePath) filename = file.webkitRelativePath;
+            // else filename = file.name;
+
+            console.log(file);
+            let buffer = await file.arrayBuffer();
+
+            console.log(new Uint8Array(buffer));
+            while (buffer.byteLength) {
+                const chunk = [...new Uint8Array(buffer.slice(0, chunkSize))];
+                buffer = buffer.slice(chunkSize);
+                // dc.send({ filename, chunk });
+                props.dc.send(JSON.stringify({ type: "data", chunk }));
+            }
+            props.dc.send(
+                JSON.stringify({
+                    type: "Done!",
+                    filename: file.name,
+                    path: file.webkitRelativePath,
+                    type: file.type,
+                }),
+            );
+        }
+    };
+
     const forwarder = (name) => {
         window.open(name.share + roomurl, "_blank");
     };
@@ -76,6 +111,13 @@ const PersonalInfo = (props) => {
             <section className={styles.connected}>
                 <span className={styles.span}>Connected users :</span>
                 <div className={styles.userlist}>{connectedUsersList()}</div>
+            </section>
+            <section className={styles.send}>
+                {props.scanning == "done" ? (
+                    <button className={styles.sendButton} onClick={sendHandler}>
+                        working
+                    </button>
+                ) : undefined}
             </section>
         </>
     );

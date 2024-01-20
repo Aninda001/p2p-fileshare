@@ -18,9 +18,16 @@ export default function Home() {
     const [dataChannel, setDataChannel] = useState(null);
     const [name, setName] = useState("");
     const [connected, setConnected] = useState([]);
+    const [selected, setSelected] = useState({
+        filelist: [],
+        totalsize: 0,
+        uploades: [],
+    });
+    const [scanning, setScanning] = useState(null);
 
     let path = usePathname();
     let channel;
+    let fileChunks = [];
     useEffect(() => {
         let name = uniqueNamesGenerator({
             dictionaries: [
@@ -78,7 +85,6 @@ export default function Home() {
                 channel = pc.createDataChannel("channel");
                 setDataChannel(channel);
                 let offer = await pc.createOffer();
-                console.log(offer);
                 // Set up event listener for open data channel
                 channel.onopen = () => {
                     channel.send(
@@ -99,13 +105,23 @@ export default function Home() {
                             ...prev,
                             { id: recieve.id, name: recieve.name },
                         ]);
-                    }
-
-                    if (recieve.type === "message") {
+                    } else if (recieve.type === "message") {
                         console.log(
                             "Received message on the sender side:",
                             recieve,
                         );
+                    } else if (recieve.type === "Done!") {
+                        // Once, all the chunks are received, combine them to form a Blob
+                        const file = new Blob([new Uint8Array(fileChunks)]);
+                        console.log(fileChunks);
+
+                        console.log("Received", file);
+                        fileChunks = [];
+                        // Download the received file using downloadjs
+                        // download(file, "test.png");
+                    } else if (recieve.type === "data") {
+                        // Keep appending various file chunks
+                        fileChunks.push(...recieve.chunk);
                     }
                 };
                 socket.emit("offer", { offer: offer, room: path });
@@ -136,25 +152,35 @@ export default function Home() {
                         ...prev,
                         { id: recieve.id, name: recieve.name },
                     ]);
-                }
+                } else if (recieve.type === "message") {
+                    console.log(
+                        "Received message on the sender side:",
+                        recieve,
+                    );
+                } else if (recieve.type === "Done!") {
+                    // Once, all the chunks are received, combine them to form a Blob
+                    const file = new Blob([new Uint8Array(fileChunks)]);
+                    console.log(fileChunks);
 
-                if (recieve.type === "message") {
-                    console.log("Received message : ", recieve);
+                    console.log("Received", file);
+                    fileChunks = [];
+                    // Download the received file using downloadjs
+                    // download(file, "test.png");
+                } else if (recieve.type === "data") {
+                    // Keep appending various file chunks
+                    fileChunks.push(...recieve.chunk);
                 }
             };
         };
         socket.on("offer", async (offer) => {
-            console.log(offer);
             await pc.setRemoteDescription(offer);
             let answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
-            console.log(answer);
             socket.emit("answer", { answer: answer, room: path });
         });
 
         socket.on("answer", async (answer) => {
             await pc.setRemoteDescription(answer);
-            console.log(answer);
         });
 
         socket.on("ice", (ice) => {
@@ -188,8 +214,19 @@ export default function Home() {
         <>
             <Navbar />
             <main className={styles.main}>
-                <FileUpload />
-                <ShareID dc={dataChannel} name={name} connected={connected} />
+                <FileUpload
+                    selected={selected}
+                    scanning={scanning}
+                    setScanning={setScanning}
+                    setSelected={setSelected}
+                />
+                <ShareID
+                    dc={dataChannel}
+                    name={name}
+                    connected={connected}
+                    selected={selected}
+                    scanning={scanning}
+                />
             </main>
         </>
     );

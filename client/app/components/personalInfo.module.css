@@ -7,7 +7,7 @@
     letter-spacing: 0.1rem;
     font-family: "Roboto Mono", monospace;
     white-space: nowrap;
-    max-width: 25vw;
+    max-width: 22vw;
     overflow: scroll;
 }
 
@@ -49,4 +49,13 @@
 
 .userlist {
     max-height: 10vh;
+}
+
+.send {
+    margin-top: auto;
+    margin-bottom: 5rem;
+}
+
+.sendButton {
+    padding: 2vh 5vw;
 }
