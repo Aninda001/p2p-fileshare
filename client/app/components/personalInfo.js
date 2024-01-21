@@ -29,38 +29,51 @@ const PersonalInfo = (props) => {
     };
 
     const sendHandler = async () => {
-        // const reader = new FileReader();
-        //
-        // reader.onload = function(e) {
-        //     // Send the chunk over the DataChannel
-        //     console.log(e);
-        // };
+        const chunkSize = 1024 * 32;
+        props.dc.send(
+            JSON.stringify({
+                type: "transfer",
+                totalSize: props.selected.totalsize,
+            }),
+        );
 
-        const chunkSize = 1024 * 16;
         for (let file of props.selected.filelist) {
-            // let filename;
-            // if (file.webkitRelativePath) filename = file.webkitRelativePath;
-            // else filename = file.name;
+            let filename;
+            if (file.webkitRelativePath) filename = file.webkitRelativePath;
+            else filename = file.name;
 
             console.log(file);
             let buffer = await file.arrayBuffer();
 
-            console.log(new Uint8Array(buffer));
             while (buffer.byteLength) {
-                const chunk = [...new Uint8Array(buffer.slice(0, chunkSize))];
+                const chunk = buffer.slice(0, chunkSize);
                 buffer = buffer.slice(chunkSize);
                 // dc.send({ filename, chunk });
-                props.dc.send(JSON.stringify({ type: "data", chunk }));
+                props.dc.send(chunk);
             }
             props.dc.send(
                 JSON.stringify({
                     type: "Done!",
                     filename: file.name,
-                    path: file.webkitRelativePath,
-                    type: file.type,
+                    filetype: file.type,
+                    pathName: filename,
                 }),
             );
         }
+    };
+
+    const downloadHandler = () => {
+        const a = document.createElement("a");
+        // document.body.appendChild(link);
+        props.download.forEach((file) => {
+            const url = URL.createObjectURL(file.file);
+            a.href = url;
+            a.download = file.pathname;
+            a.click();
+            URL.revokeObjectURL(url);
+            // document.body.removeChild(a);
+        });
+        a.remove();
     };
 
     const forwarder = (name) => {
@@ -115,9 +128,19 @@ const PersonalInfo = (props) => {
             <section className={styles.send}>
                 {props.scanning == "done" ? (
                     <button className={styles.sendButton} onClick={sendHandler}>
-                        working
+                        Send
                     </button>
                 ) : undefined}
+            </section>
+            <section className={styles.send}>
+                {props.download && props.download.length > 0 && (
+                    <button
+                        className={styles.sendButton}
+                        onClick={downloadHandler}
+                    >
+                        Download
+                    </button>
+                )}
             </section>
         </>
     );

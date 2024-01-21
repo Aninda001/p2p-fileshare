@@ -1,7 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Navbar from "../components/navbar";
-import ShareID from "../components/shareID";
+// import ShareID from "../components/shareID";
+const ShareID = dynamic(() => import("../components/shareID"), {
+    ssr: false,
+});
 import styles from "./page.module.css";
 import FileUpload from "../components/filedrop";
 import { socket } from "../socket";
@@ -24,10 +28,15 @@ export default function Home() {
         uploades: [],
     });
     const [scanning, setScanning] = useState(null);
+    const [download, setDownload] = useState([]);
 
     let path = usePathname();
-    let channel;
-    let fileChunks = [];
+    let channel,
+        connectedUser,
+        totalSize = 0,
+        receivedSize = 0;
+    let fileChunks = [],
+        files = [];
     useEffect(() => {
         let name = uniqueNamesGenerator({
             dictionaries: [
@@ -99,30 +108,53 @@ export default function Home() {
 
                 // Set up event listener for receiving messages
                 channel.onmessage = (event) => {
-                    let recieve = JSON.parse(event.data);
-                    if (recieve.type === "username") {
-                        setConnected((prev) => [
-                            ...prev,
-                            { id: recieve.id, name: recieve.name },
-                        ]);
-                    } else if (recieve.type === "message") {
-                        console.log(
-                            "Received message on the sender side:",
-                            recieve,
-                        );
-                    } else if (recieve.type === "Done!") {
-                        // Once, all the chunks are received, combine them to form a Blob
-                        const file = new Blob([new Uint8Array(fileChunks)]);
-                        console.log(fileChunks);
+                    if (typeof event.data === "string") {
+                        let recieve = JSON.parse(event.data);
+                        if (recieve.type === "username") {
+                            setConnected((prev) => [
+                                ...prev,
+                                { id: recieve.id, name: recieve.name },
+                            ]);
+                            connectedUser = recieve.id;
+                        } else if (recieve.type === "message") {
+                            console.log(
+                                "Received message on the sender side:",
+                                recieve,
+                            );
+                        } else if (recieve.type === "transfer") {
+                            totalSize = recieve.totalSize;
+                        } else if (recieve.type === "Done!") {
+                            // Once, all the chunks are received, combine them to form a Blob
+                            const file = new File(
+                                fileChunks,
+                                `${recieve.filename}`,
+                                { type: `${recieve.filetype}` },
+                            );
 
-                        console.log("Received", file);
-                        fileChunks = [];
-                        // Download the received file using downloadjs
-                        // download(file, "test.png");
-                    } else if (recieve.type === "data") {
+                            files.push({ file, pathname: recieve.pathName });
+                            console.log("Received", file);
+                            fileChunks = [];
+                            if (totalSize === receivedSize && totalSize !== 0) {
+                                setDownload(files);
+                                files = [];
+                                totalSize = 0;
+                                receivedSize = 0;
+                            }
+                            // Download the received file using downloadjs
+                            // download(file, "test.png");
+                        }
+                    } else {
                         // Keep appending various file chunks
-                        fileChunks.push(...recieve.chunk);
+                        fileChunks.push(event.data);
+                        receivedSize += event.data.size;
                     }
+                };
+
+                channel.onclose = () => {
+                    console.log("disconnected user", connectedUser);
+                    setConnected((prev) =>
+                        prev.filter((user) => user.id !== connectedUser),
+                    );
                 };
                 socket.emit("offer", { offer: offer, room: path });
                 await pc.setLocalDescription(offer);
@@ -146,30 +178,55 @@ export default function Home() {
 
             // Set up event listener for receiving messages
             channel.onmessage = (event) => {
-                let recieve = JSON.parse(event.data);
-                if (recieve.type === "username") {
-                    setConnected((prev) => [
-                        ...prev,
-                        { id: recieve.id, name: recieve.name },
-                    ]);
-                } else if (recieve.type === "message") {
-                    console.log(
-                        "Received message on the sender side:",
-                        recieve,
-                    );
-                } else if (recieve.type === "Done!") {
-                    // Once, all the chunks are received, combine them to form a Blob
-                    const file = new Blob([new Uint8Array(fileChunks)]);
-                    console.log(fileChunks);
+                if (typeof event.data === "string") {
+                    let recieve = JSON.parse(event.data);
+                    if (recieve.type === "username") {
+                        setConnected((prev) => [
+                            ...prev,
+                            { id: recieve.id, name: recieve.name },
+                        ]);
+                        connectedUser = recieve.id;
+                    } else if (recieve.type === "message") {
+                        console.log(
+                            "Received message on the sender side:",
+                            recieve,
+                        );
+                    } else if (recieve.type === "transfer") {
+                        totalSize = recieve.totalSize;
+                    } else if (recieve.type === "Done!") {
+                        // Once, all the chunks are received, combine them to form a Blob
+                        const file = new File(
+                            fileChunks,
+                            `${recieve.filename}`,
+                            {
+                                type: `${recieve.filetype}`,
+                            },
+                        );
 
-                    console.log("Received", file);
-                    fileChunks = [];
-                    // Download the received file using downloadjs
-                    // download(file, "test.png");
-                } else if (recieve.type === "data") {
+                        files.push({ file, pathname: recieve.pathName });
+                        console.log("Received", file);
+                        fileChunks = [];
+                        if (totalSize === receivedSize && totalSize !== 0) {
+                            setDownload(files);
+                            files = [];
+                            totalSize = 0;
+                            receivedSize = 0;
+                        }
+                        // Download the received file using downloadjs
+                        // download(file, "test.png");
+                    }
+                } else {
                     // Keep appending various file chunks
-                    fileChunks.push(...recieve.chunk);
+                    fileChunks.push(event.data);
+                    receivedSize += event.data.size;
                 }
+            };
+
+            channel.onclose = () => {
+                console.log("disconnected user", connectedUser);
+                setConnected((prev) =>
+                    prev.filter((user) => user.id !== connectedUser),
+                );
             };
         };
         socket.on("offer", async (offer) => {
@@ -226,6 +283,8 @@ export default function Home() {
                     connected={connected}
                     selected={selected}
                     scanning={scanning}
+                    download={download}
+                    setDownload={setDownload}
                 />
             </main>
         </>
