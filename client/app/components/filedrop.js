@@ -91,8 +91,8 @@ const FileUpload = ({ scanning, setScanning, selected, setSelected }) => {
             let folder = 0,
                 file = 0;
             for (let i of selected.uploades) {
-                if (i.isFile) file++;
-                else folder++;
+                if (i.isDirectory) folder++;
+                else file++;
             }
             return (
                 <span>

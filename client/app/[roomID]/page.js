@@ -60,11 +60,6 @@ export default function Home() {
                     username: "webrtc@live.com",
                     credential: "muazkh",
                 },
-                {
-                    url: "turn:192.158.29.39:3478?transport=udp",
-                    credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
-                    username: "28224511:1379330808",
-                },
             ],
         });
 
@@ -93,6 +88,7 @@ export default function Home() {
             } else {
                 channel = pc.createDataChannel("channel");
                 setDataChannel(channel);
+                // channel.bufferedAmountLowThreshold = 5 * 1024 * 1024;
                 let offer = await pc.createOffer();
                 // Set up event listener for open data channel
                 channel.onopen = () => {
@@ -146,7 +142,11 @@ export default function Home() {
                     } else {
                         // Keep appending various file chunks
                         fileChunks.push(event.data);
-                        receivedSize += event.data.size;
+                        if (isNaN(event.data.size)) {
+                            receivedSize += event.data.byteLength;
+                        } else {
+                            receivedSize += event.data.size;
+                        }
                     }
                 };
 
@@ -164,6 +164,7 @@ export default function Home() {
         pc.ondatachannel = (event) => {
             channel = event.channel;
             setDataChannel(channel);
+            // channel.bufferedAmountLowThreshold = 5 * 1024 * 1024;
             // Set up event listener for open data channel
             channel.onopen = () => {
                 channel.send(
@@ -174,6 +175,7 @@ export default function Home() {
                     }),
                 );
                 console.log("Data channel is open.");
+                // console.log(channel);
             };
 
             // Set up event listener for receiving messages
@@ -218,7 +220,11 @@ export default function Home() {
                 } else {
                     // Keep appending various file chunks
                     fileChunks.push(event.data);
-                    receivedSize += event.data.size;
+                    if (isNaN(event.data.size)) {
+                        receivedSize += event.data.byteLength;
+                    } else {
+                        receivedSize += event.data.size;
+                    }
                 }
             };
 

@@ -29,7 +29,7 @@ const PersonalInfo = (props) => {
     };
 
     const sendHandler = async () => {
-        const chunkSize = 1024 * 32;
+        const chunkSize = 1024 * 256;
         props.dc.send(
             JSON.stringify({
                 type: "transfer",
@@ -49,8 +49,41 @@ const PersonalInfo = (props) => {
                 const chunk = buffer.slice(0, chunkSize);
                 buffer = buffer.slice(chunkSize);
                 // dc.send({ filename, chunk });
-                props.dc.send(chunk);
+                if (
+                    props.dc.bufferedAmount >
+                    props.dc.bufferedAmountLowThreshold
+                ) {
+                    await new Promise((res) => {
+                        props.dc.onbufferedamountlow = () => {
+                            props.dc.onbufferedamountlow = null;
+                            res();
+                        };
+                    });
+                    props.dc.send(chunk);
+                } else {
+                    props.dc.send(chunk);
+                }
             }
+
+            // const send = () => {
+            //     while (buffer.byteLength) {
+            //         if (
+            //             props.dc.bufferedAmount >
+            //             props.dc.bufferedAmountLowThreshold
+            //         ) {
+            //             props.dc.onbufferedamountlow = () => {
+            //                 props.dc.onbufferedamountlow = null;
+            //                 send();
+            //             };
+            //             return;
+            //         }
+            //         const chunk = buffer.slice(0, chunkSize);
+            //         buffer = buffer.slice(chunkSize, buffer.byteLength);
+            //         props.dc.send(chunk);
+            //     }
+            // };
+            // send();
+
             props.dc.send(
                 JSON.stringify({
                     type: "Done!",
