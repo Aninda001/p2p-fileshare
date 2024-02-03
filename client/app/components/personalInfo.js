@@ -65,25 +65,6 @@ const PersonalInfo = (props) => {
                 }
             }
 
-            // const send = () => {
-            //     while (buffer.byteLength) {
-            //         if (
-            //             props.dc.bufferedAmount >
-            //             props.dc.bufferedAmountLowThreshold
-            //         ) {
-            //             props.dc.onbufferedamountlow = () => {
-            //                 props.dc.onbufferedamountlow = null;
-            //                 send();
-            //             };
-            //             return;
-            //         }
-            //         const chunk = buffer.slice(0, chunkSize);
-            //         buffer = buffer.slice(chunkSize, buffer.byteLength);
-            //         props.dc.send(chunk);
-            //     }
-            // };
-            // send();
-
             props.dc.send(
                 JSON.stringify({
                     type: "Done!",
@@ -165,7 +146,7 @@ const PersonalInfo = (props) => {
                     </button>
                 ) : undefined}
             </section>
-            <section className={styles.send}>
+            <section className={styles.receive}>
                 {props.download && props.download.length > 0 && (
                     <button
                         className={styles.sendButton}

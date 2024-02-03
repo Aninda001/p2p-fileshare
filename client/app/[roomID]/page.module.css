@@ -3,3 +3,11 @@
     flex-direction: row;
     justify-content: space-evenly;
 }
+
+@media (max-width: 800px) {
+    .main {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: space-evenly;
+    }
+}

@@ -2,10 +2,8 @@
 
 import dynamic from "next/dynamic";
 import Navbar from "../components/navbar";
-// import ShareID from "../components/shareID";
-const ShareID = dynamic(() => import("../components/shareID"), {
-    ssr: false,
-});
+import ShareID from "../components/shareID";
+// const ShareID = dynamic(() => import("../components/shareID"), { ssr: false });
 import styles from "./page.module.css";
 import FileUpload from "../components/filedrop";
 import { socket } from "../socket";
