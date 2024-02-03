@@ -9,6 +9,13 @@ const io = new Server(process.env.PORT || 5000, {
     },
 });
 
+setInterval(
+    () => {
+        console.log("keep alive");
+    },
+    1000 * 60 * 5,
+);
+
 io.on("connection", async (socket) => {
     // ...
     console.log(`${socket.id} connected`);

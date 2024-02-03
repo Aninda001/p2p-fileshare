@@ -140,7 +140,7 @@ const PersonalInfo = (props) => {
                 <div className={styles.userlist}>{connectedUsersList()}</div>
             </section>
             <section className={styles.send}>
-                {props.scanning == "done" ? (
+                {props.scanning == "done" && props.connected.length > 0 ? (
                     <button className={styles.sendButton} onClick={sendHandler}>
                         Send
                     </button>
