@@ -1,20 +1,21 @@
+import express from "express";
+import { createServer } from "http";
 import { Server } from "socket.io";
 
-const io = new Server(process.env.PORT || 5000, {
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
     /* options */
-
     cors: {
         // origin: "http://localhost:3000",
         origin: "*",
     },
 });
 
-setInterval(
-    () => {
-        console.log("keep alive");
-    },
-    1000 * 60 * 5,
-);
+app.get("/", (req, res) => {
+    res.send("<h1>Hello world</h1>");
+    console.log("Cron job hit");
+});
 
 io.on("connection", async (socket) => {
     // ...
@@ -57,3 +58,5 @@ io.on("connection", async (socket) => {
         io.emit("disconnected_user", socket.id);
     });
 });
+
+httpServer.listen(process.env.PORT || 5000);
