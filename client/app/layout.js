@@ -6,6 +6,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
     title: "P2P File Share",
     description: "Web app to share file with only internet.",
+    icons: {
+        icon: "/icon.ico",
+    },
 };
 
 export default function RootLayout({ children }) {

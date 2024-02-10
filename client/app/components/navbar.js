@@ -2,7 +2,7 @@ import styles from "./navbar.module.css";
 import Image from "next/image";
 import Link from "next/link";
 
-const Navbar = () => {
+const Navbar = ({ toggleModal }) => {
     return (
         <nav className={styles.navbar}>
             <Link href="/">
@@ -14,19 +14,28 @@ const Navbar = () => {
                     className={styles.logo}
                 />
             </Link>
-            <Link
-                href="https://github.com/Aninda001/p2p-fileshare"
-                rel="noopener noreferrer"
-                target="_blank"
-            >
+            <span>
                 <Image
-                    src="/logo-2582757_640.png"
-                    alt="github logo"
+                    src="/guidebook.png"
+                    alt="guidebook logo"
                     width={45}
                     height={45}
-                    className={styles.git}
+                    onClick={toggleModal}
                 />
-            </Link>
+                <Link
+                    href="https://github.com/Aninda001/p2p-fileshare"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    <Image
+                        src="/logo-2582757_640.png"
+                        alt="github logo"
+                        width={45}
+                        height={45}
+                        className={styles.git}
+                    />
+                </Link>
+            </span>
         </nav>
     );
 };

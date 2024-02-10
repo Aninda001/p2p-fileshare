@@ -1,0 +1,16 @@
+.modal::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+    margin: auto;
+    border: 1px solid #888;
+    padding: 10px;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.modalClose {
+    padding: 5px 10px;
+    margin: 10px 0px;
+}

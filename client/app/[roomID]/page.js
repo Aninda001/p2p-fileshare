@@ -2,9 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Navbar from "../components/navbar";
-// import ShareID from "../components/shareID";
 const ShareID = dynamic(() => import("../components/shareID"), { ssr: false });
 import styles from "./page.module.css";
+import Modal from "../components/modal";
 import FileUpload from "../components/filedrop";
 import { socket } from "../socket";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import {
 } from "unique-names-generator";
 
 export default function Home() {
+    const [modal, setModal] = useState(true);
     const [dataChannel, setDataChannel] = useState(null);
     const [name, setName] = useState("");
     const [connected, setConnected] = useState([]);
@@ -273,7 +274,8 @@ export default function Home() {
 
     return (
         <>
-            <Navbar />
+            <Navbar toggleModal={() => setModal((prev) => !prev)} />
+            <Modal openModal={modal} closeModal={() => setModal(false)} />
             <main className={styles.main}>
                 <FileUpload
                     selected={selected}
