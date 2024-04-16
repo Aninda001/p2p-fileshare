@@ -110,7 +110,13 @@ const PersonalInfo = (props) => {
                             className={copied ? styles.copied : styles.copy}
                             onClick={copyHandler}
                         >
-                            {copied ? <span>Copied&#10003;</span> : "Copy"}
+                            <img
+                                src="/copy-96.png"
+                                height={15}
+                                width={15}
+                                alt="copy"
+                            />
+                            {copied ? <span> Copied&#10003;</span> : " Copy"}
                         </button>
                     </CopyToClipboard>
                 </div>
@@ -142,7 +148,13 @@ const PersonalInfo = (props) => {
             <section className={styles.send}>
                 {props.scanning == "done" && props.connected.length > 0 ? (
                     <button className={styles.sendButton} onClick={sendHandler}>
-                        Send
+                        <img
+                            src="/send-94.png"
+                            height={15}
+                            width={25}
+                            alt="send"
+                        />
+                        {" Send"}
                     </button>
                 ) : undefined}
             </section>
@@ -152,7 +164,13 @@ const PersonalInfo = (props) => {
                         className={styles.sendButton}
                         onClick={downloadHandler}
                     >
-                        Download
+                        <img
+                            src="/download-48.png"
+                            height={25}
+                            width={20}
+                            alt="download"
+                        />
+                        {" Download"}
                     </button>
                 )}
             </section>
