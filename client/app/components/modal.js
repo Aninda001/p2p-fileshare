@@ -14,9 +14,9 @@ function Modal({ openModal, closeModal }) {
 
     return (
         <dialog ref={ref} className={styles.modal} onCancel={closeModal}>
-            To establish a connection, please use without a VPN or proxy.
+            To establish a connection, use without a VPN or proxy.
             <br />
-            For sending multiple files or folders , please use the zip format.
+            For sending multiple files or folders , use the zip format.
             <br />
             (As the receiver will get the files without a folder structure.)
             <br />

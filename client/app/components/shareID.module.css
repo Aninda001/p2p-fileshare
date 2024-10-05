@@ -4,7 +4,7 @@
     width: 40vw;
     height: 80vh;
     align-items: center;
-    background-color: rgba(173, 111, 111, 0.61);
+    background-color: rgba(173, 111, 111, 0.7);
     border-radius: 0.5rem;
     overflow: scroll;
 }
