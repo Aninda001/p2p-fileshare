@@ -18,7 +18,7 @@ import {
 
 export default function Home() {
     const [modal, setModal] = useState(true);
-    const [dataChannel, setDataChannel] = useState(null);
+    const [dataChannel, setDataChannel] = useState([]);
     const [name, setName] = useState("");
     const [connected, setConnected] = useState([]);
     const [selected, setSelected] = useState({
@@ -30,8 +30,7 @@ export default function Home() {
     const [download, setDownload] = useState([]);
 
     let path = usePathname();
-    let channel,
-        connectedUser,
+    let connectedUser,
         totalSize = 0,
         receivedSize = 0;
 
@@ -132,8 +131,6 @@ export default function Home() {
         });
         setName(name);
         socket.connect();
-        let pc = peerConnection();
-
         socket.on("connect", () => {
             console.log("connected with signalling server");
         });
@@ -143,61 +140,98 @@ export default function Home() {
         });
 
         socket.emit("addRoom", path, name);
-        socket.emit("fetchlength", path);
-
-        socket.on("length", async (len) => {
-            if (len === 0) {
-                console.log("no peers connected");
-            } else {
-                channel = pc.createDataChannel("channel");
-                setDataChannel(channel);
-                // channel.bufferedAmountLowThreshold = 5 * 1024 * 1024;
-                let offer = await pc.createOffer();
-
-                dataHandling(channel);
-                channelEvent(channel, name);
-
-                socket.emit("offer", { offer: offer, room: path });
-                await pc.setLocalDescription(offer);
-                socket.on("answer", async (answer) => {
-                    await pc.setRemoteDescription(answer);
-                });
-            }
-        });
-        pc.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit("ice", {
-                    ice: event.candidate,
-                    room: path,
-                });
-            } else {
-                console.log("No more ICE candidate");
-            }
-        };
-
-        pc.ondatachannel = (event) => {
-            channel = event.channel;
-            setDataChannel(channel);
+        socket.on("newChannel", async (id) => {
+            let pc = peerConnection();
+            let channel = pc.createDataChannel("channel");
+            setDataChannel((prev) => [...prev, channel]);
             // channel.bufferedAmountLowThreshold = 5 * 1024 * 1024;
-
+            let offer = await pc.createOffer();
             dataHandling(channel);
             channelEvent(channel, name);
-        };
-        socket.on("offer", async (offer) => {
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit(
+                        "ice",
+                        {
+                            ice: event.candidate,
+                            room: path,
+                        },
+                        id,
+                        socket.id,
+                    );
+                } else {
+                    console.log("No more ICE candidate");
+                }
+            };
+
+            socket.on("ice", (ice, sender, reciever) => {
+                pc.addIceCandidate(new RTCIceCandidate(ice))
+                    .then(() => {
+                        console.log(`ICE Candidate added successfully.`);
+                    })
+                    .catch((error) => {
+                        console.error("Error adding ICE Candidate:", error);
+                    });
+            });
+
+            socket.emit("offer", { offer: offer, room: path }, id, socket.id);
+            await pc.setLocalDescription(offer);
+            console.log(id, socket.id);
+            socket.once("answer", async (answer, sender, reciever) => {
+                console.log("answer", sender, reciever, socket.id);
+                if (reciever === socket.id)
+                    await pc.setRemoteDescription(answer);
+            });
+        });
+
+        socket.on("offer", async (offer, sender, reciever) => {
+            let pc = peerConnection();
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit(
+                        "ice",
+                        {
+                            ice: event.candidate,
+                            room: path,
+                        },
+                        sender,
+                        reciever,
+                    );
+                } else {
+                    console.log("No more ICE candidate");
+                }
+            };
+
+            let channel;
+            pc.ondatachannel = (event) => {
+                channel = event.channel;
+                setDataChannel((prev) => [...prev, channel]);
+                // channel.bufferedAmountLowThreshold = 5 * 1024 * 1024;
+                dataHandling(channel);
+                channelEvent(channel, name);
+            };
+
+            socket.on("ice", (ice, sender, reciever) => {
+                pc.addIceCandidate(new RTCIceCandidate(ice))
+                    .then(() => {
+                        console.log(`ICE Candidate added successfully.`);
+                    })
+                    .catch((error) => {
+                        console.error("Error adding ICE Candidate:", error);
+                    });
+            });
+
             await pc.setRemoteDescription(offer);
             let answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
-            socket.emit("answer", { answer: answer, room: path });
-        });
 
-        socket.on("ice", (ice) => {
-            pc.addIceCandidate(new RTCIceCandidate(ice))
-                .then(() => {
-                    console.log(`ICE Candidate added successfully.`);
-                })
-                .catch((error) => {
-                    console.error("Error adding ICE Candidate:", error);
-                });
+            console.log("offer", sender, reciever, socket.id);
+            socket.emit(
+                "answer",
+                { answer: answer, room: path },
+                sender,
+                reciever,
+            );
         });
 
         socket.on("disconnected_user", (id) => {

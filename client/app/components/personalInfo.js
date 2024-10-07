@@ -30,50 +30,51 @@ const PersonalInfo = (props) => {
 
     const sendHandler = async () => {
         const chunkSize = 1024 * 256;
-        props.dc.send(
-            JSON.stringify({
-                type: "transfer",
-                totalSize: props.selected.totalsize,
-            }),
+        props.dc.forEach((dc) =>
+            dc.send(
+                JSON.stringify({
+                    type: "transfer",
+                    totalSize: props.selected.totalsize,
+                }),
+            ),
         );
 
-        for (let file of props.selected.filelist) {
-            let filename;
-            if (file.webkitRelativePath) filename = file.webkitRelativePath;
-            else filename = file.name;
+        props.dc.forEach(async (dc) => {
+            for (let file of props.selected.filelist) {
+                let filename;
+                if (file.webkitRelativePath) filename = file.webkitRelativePath;
+                else filename = file.name;
 
-            console.log(file);
-            let buffer = await file.arrayBuffer();
+                console.log(file);
+                let buffer = await file.arrayBuffer();
 
-            while (buffer.byteLength) {
-                const chunk = buffer.slice(0, chunkSize);
-                buffer = buffer.slice(chunkSize);
-                // dc.send({ filename, chunk });
-                if (
-                    props.dc.bufferedAmount >
-                    props.dc.bufferedAmountLowThreshold
-                ) {
-                    await new Promise((res) => {
-                        props.dc.onbufferedamountlow = () => {
-                            props.dc.onbufferedamountlow = null;
-                            res();
-                        };
-                    });
-                    props.dc.send(chunk);
-                } else {
-                    props.dc.send(chunk);
+                while (buffer.byteLength) {
+                    const chunk = buffer.slice(0, chunkSize);
+                    buffer = buffer.slice(chunkSize);
+                    // dc.send({ filename, chunk });
+                    if (dc.bufferedAmount > dc.bufferedAmountLowThreshold) {
+                        await new Promise((res) => {
+                            dc.onbufferedamountlow = () => {
+                                dc.onbufferedamountlow = null;
+                                res();
+                            };
+                        });
+                        dc.send(chunk);
+                    } else {
+                        dc.send(chunk);
+                    }
                 }
-            }
 
-            props.dc.send(
-                JSON.stringify({
-                    type: "Done!",
-                    filename: file.name,
-                    filetype: file.type,
-                    pathName: filename,
-                }),
-            );
-        }
+                dc.send(
+                    JSON.stringify({
+                        type: "Done!",
+                        filename: file.name,
+                        filetype: file.type,
+                        pathName: filename,
+                    }),
+                );
+            }
+        });
     };
 
     const downloadHandler = () => {

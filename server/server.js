@@ -22,35 +22,26 @@ io.on("connection", async (socket) => {
     console.log(`${socket.id} connected`);
     socket.emit("message", "from server");
 
-    socket.on("fetchlength", async (roomid) => {
-        let len = await socket.in(roomid).fetchSockets();
-        socket.emit("length", len.length);
-        console.log(len.length);
-    });
-
     socket.on("addRoom", (room_name, name) => {
         socket.join(`${room_name}`);
         console.log(`${name} added to room ${room_name}`);
+        socket.to(room_name).emit("newChannel", socket.id);
     });
 
     socket.on("recieved", (data) => {
         socket.to(data.sender).emit("sender_joined", data.name);
     });
 
-    socket.on("sender_joined", (name, roomid) => {
-        socket.to(roomid).emit("joined", name, socket.id);
+    socket.on("offer", (sendOffer, reciever, sender) => {
+        socket.to(reciever).emit("offer", sendOffer.offer, sender, reciever);
     });
 
-    socket.on("offer", (sendOffer) => {
-        socket.to(sendOffer.room).emit("offer", sendOffer.offer);
+    socket.on("answer", (sendAnswer, reciever, sender) => {
+        socket.to(reciever).emit("answer", sendAnswer.answer, sender, reciever);
     });
 
-    socket.on("answer", (sendAnswer) => {
-        socket.to(sendAnswer.room).emit("answer", sendAnswer.answer);
-    });
-
-    socket.on("ice", (sendIce) => {
-        socket.to(sendIce.room).emit("ice", sendIce.ice);
+    socket.on("ice", (sendIce, reciever, sender) => {
+        socket.to(reciever).emit("ice", sendIce.ice, sender, reciever);
     });
 
     socket.on("disconnect", () => {
