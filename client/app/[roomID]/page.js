@@ -176,9 +176,7 @@ export default function Home() {
 
             socket.emit("offer", { offer: offer, room: path }, id, socket.id);
             await pc.setLocalDescription(offer);
-            console.log(id, socket.id);
             socket.once("answer", async (answer, sender, reciever) => {
-                console.log("answer", sender, reciever, socket.id);
                 if (reciever === socket.id)
                     await pc.setRemoteDescription(answer);
             });
@@ -225,7 +223,6 @@ export default function Home() {
             let answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
 
-            console.log("offer", sender, reciever, socket.id);
             socket.emit(
                 "answer",
                 { answer: answer, room: path },
