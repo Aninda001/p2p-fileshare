@@ -2,6 +2,10 @@
 
 A real-time peer-to-peer file sharing web application built with Next.js and WebRTC that enables direct file transfers between browsers.
 
+## 📸 Preview
+
+https://github.com/Aninda001/p2p-fileshare/assets/Preview/demo.mp4
+
 ## 🌐 Live Demo
 
 Check out the live application: [P2P File Share](https://p2p-fileshare.vercel.app/)
