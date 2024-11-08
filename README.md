@@ -4,7 +4,7 @@ A real-time peer-to-peer file sharing web application built with Next.js and Web
 
 ## 📸 Preview
 
-https://github.com/Aninda001/p2p-fileshare/assets/Preview/P2P_Demo.mp4
+https://github.com/Aninda001/p2p-fileshare/Preview/P2P_Demo.mp4
 
 ## 🌐 Live Demo
 
